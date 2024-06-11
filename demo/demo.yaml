@@ -7,6 +7,11 @@ paths:
     get:
       summary: Greet the user
       operationId: handleHello
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
       responses:
         '200':
           description: Successful response
