@@ -15,10 +15,16 @@ import (
 	"path"
 	"strings"
 
+	"github.com/discord-gophers/goapi-gen/runtime"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
+
+// HandleHelloParams defines parameters for HandleHello.
+type HandleHelloParams struct {
+	Name *string `json:"name,omitempty"`
+}
 
 // Response is a common response struct for all the API calls.
 // A Response object may be instantiated via functions for specific operation responses.
@@ -75,7 +81,7 @@ func HandleHelloJSON200Response(body []string) *Response {
 type ServerInterface interface {
 	// Greet the user
 	// (GET /hello)
-	HandleHello(w http.ResponseWriter, r *http.Request) *Response
+	HandleHello(w http.ResponseWriter, r *http.Request, params HandleHelloParams) *Response
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -88,8 +94,19 @@ type ServerInterfaceWrapper struct {
 func (siw *ServerInterfaceWrapper) HandleHello(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params HandleHelloParams
+
+	// ------------- Optional query parameter "name" -------------
+
+	if err := runtime.BindQueryParameter("form", true, false, "name", r.URL.Query(), &params.Name); err != nil {
+		err = fmt.Errorf("invalid format for parameter name: %w", err)
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{err, "name"})
+		return
+	}
+
 	var handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp := siw.Handler.HandleHello(w, r)
+		resp := siw.Handler.HandleHello(w, r, params)
 		if resp != nil {
 			if resp.body != nil {
 				render.Render(w, r, resp)
@@ -243,11 +260,11 @@ func WithErrorHandler(handler func(w http.ResponseWriter, r *http.Request, err e
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/0yPwWorMQxFf2W4ayeZ97rzrqs2u0K/wHiUjIstG0tTOgz+92I3ha4khM7l3AM+p5KZ",
-	"WAX2aAaBbxn2gAaNBItXijFPz29XGHxSlZAZFv/O83lGM8iF2JUAi6dxMihO156Fy9rRvt1J+8iFqtOQ",
-	"+br0YMdLpBEPg0pSMgsN8v889+EzK/FAXSkx+AFfPqQrHBC/UnJ9C0ppgLqX7ixaA9+73uPganU7WmsG",
-	"C4mvoehPj/fNexK5bXH6NUD/ki0lV3dYvFQinXSlaROqMPg63fPptrF/RIQlnf92aa217wAAAP//akWO",
-	"p1cBAAA=",
+	"H4sIAAAAAAAC/2yQvW7jMBCEX0WYmrZ1dx27qxJ3AVIGKQhqbTEQf7K7CiIIfPeATAy4SDXEgPvx4+7w",
+	"OZacKKnA7tUgpEuG3aFBF4LFIy1LHv4/nWHwQSwhJ1j8OY7HEdUgF0quBFj865VBcTo3Fk5zG22nK2mL",
+	"XIidhpzOUwO7NC3U8X2KXSQlFtiXHaE98r4SbzBILjaTHgbiZ4quK26l9aIc0hW1vhowSclJqAv8HccW",
+	"Piel1A1cKUvw3eH0Ju0n+x0vKEX5BWxuhWN2G2qtBhOJ51D0ex3Pq/ckclmX4WaAdkvWGB1vsHhgIh10",
+	"pmEVYhh8Hq75cFmT/0GEKR7vV1JrrV8BAAD//8N767CeAQAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
