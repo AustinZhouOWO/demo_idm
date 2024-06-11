@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/go-chi/render"
 	"github.com/tendant/chi-demo/app"
 )
 
@@ -13,6 +14,13 @@ func main() {
 	myApp.Run()
 }
 
+type Hello struct {
+	Name string
+}
+
 func handleHello(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello World!"))
+	result := Hello{
+		Name: "Austin Zhou",
+	}
+	render.JSON(w, r, result)
 }
