@@ -3,8 +3,8 @@ module github.com/AustinZhouOWO/demo_idm
 go 1.22.2
 
 require (
+	github.com/discord-gophers/goapi-gen v0.2.2
 	github.com/getkin/kin-openapi v0.116.0
-	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/chi/v5 v5.0.11
 	github.com/go-chi/render v1.0.2
 	github.com/tendant/chi-demo v1.1.0
