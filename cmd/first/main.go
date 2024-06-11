@@ -1,7 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"github.com/tendant/chi-demo/app"
+)
 
 func main() {
-	fmt.Println("Hello World!")
+	myApp := app.Default()
+	myApp.Run()
 }
