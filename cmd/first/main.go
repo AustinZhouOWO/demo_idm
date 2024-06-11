@@ -15,7 +15,7 @@ func main() {
 }
 
 type Hello struct {
-	Name string
+	Name string `json:"name"`
 }
 
 func handleHello(w http.ResponseWriter, r *http.Request) {
